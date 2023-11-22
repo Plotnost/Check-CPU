@@ -2,39 +2,48 @@
 //
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
 #include <windows.h>
+
+__int64 clock1;
+__int64 clock2;
 
 int main()
 {
-	
-	unsigned clock = 0;
-	unsigned long long average = 0;
-	int i;
+    unsigned long long diff;
+    unsigned long long aver = 0;
+    int i;
 
-	for (i = 0; i < 5; i++)
-	{
-		__asm rdtsc;
-		__asm mov[clock], eax;
+    for (i = 0; i < 10; i++)
+    {
+        __asm {
+            rdtsc;
+            mov dword ptr[clock1], eax
+            mov dword ptr[clock1 + 4], edx
+        }
 
-		// задержка 1 секунда
-		Sleep(1000);
+        Sleep(1000);
 
+        __asm {
+            rdtsc;
+            mov dword ptr[clock2], eax
+            mov dword ptr[clock2 + 4], edx
+        }
 
-		__asm rdtsc;
-		__asm sub eax, [clock];
-		__asm mov[clock], eax;
+        
 
-		// количество тактов процессора на вычисления
-		printf("Number of cycles in the %u iteration %u\n", i+1, clock);
-		average += clock;
-	};
-	average = average / i;
-	printf("average number of cycles %llu\n", average);
-	printf("CPU frequency %f\n", float(average)/1000000000);
+        // Рассчитываем прошедшее время в тактах процессора
+        diff = clock2 - clock1;
 
-	system("pause");
+        // количество тактов процессора на вычисления
+        printf("Number of cycles in the %u iteration %lld\n", i + 1, diff);
+        aver += diff;
+    }
 
-	return 0;
+    aver = aver / i;
+    printf("average number of cycles %llu\n", aver);
+    printf("CPU frequency %f GHz\n", float(aver) / 1000000000);
+
+    system("pause");
+
+    return 0;
 }
