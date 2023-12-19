@@ -13,7 +13,9 @@ int main()
     unsigned long long aver = 0;
     int i;
 
-    for (i = 0; i < 10; i++)
+    SetProcessAffinityMask(GetCurrentProcess(), 3);
+
+    for (i = 0; i < 15; i++)
     {
         __asm {
             rdtsc;
